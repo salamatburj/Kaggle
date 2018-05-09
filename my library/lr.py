@@ -12,15 +12,25 @@ class lr():
     while number of rows is features (n_x,m)
     Y- results is (1,m) matrix
     '''
-    def __init__(self,X,Y,learning_rate=0.01,iterations=100):
+    def __init__(self,X,Y,X_cv=[],Y_cv=[],CV=False,learning_rate=0.01,iterations=100):
         self.X=X
         self.Y=Y
         self.learning_rate=learning_rate
         self.iterations=iterations
         self.W,self.b=self.initialize()
         self.error=[]
-
+        self.CV=CV
+        # decided to put in order to have get error from cross validation if X_cv and Y_cv is provided
+        if self.CV : #true of false
+            self.X_cv=X_cv
+            self.Y_cv=Y_cv
+            self.error_cv=[]
     def initialize(self):
+        ''' W should same length as features X, (n_x,1), while b same number as
+        number of train data, (1,m). However, b is same for all training examples
+        We can use python broadcasting , and just define b is one number, which is zero
+        
+        '''
         n_x=self.X.shape[0]
         W=np.zeros((n_x,1)) 
         b=0
@@ -31,12 +41,15 @@ class lr():
             Y_hat=self.sigmoid(self.Z(self.X,W,b))
             J=self.cost(Y_hat)
             self.error.append(J)
+            if self.CV: # True or False
+                Y_hat_cv=self.sigmoid(self.Z(self.X_cv,W,b))
+                J_cv=self.cost_cv(Y_hat_cv)
+                self.error_cv.append(J_cv)
             dW,db=self.grad(Y_hat,W,b)
             W=W-self.learning_rate*dW
             b=b-self.learning_rate*db
-            
-        self.W=W
-        self.b=b
+            self.W=W
+            self.b=b
 
     def predict_proba(self,X):
         W,b=self.W,self.b
@@ -58,6 +71,12 @@ class lr():
     def cost(self,Y_hat):
         m=self.X.shape[1]
         J=(-1/m)*np.sum(self.Y*np.log(Y_hat)+(1-self.Y)*np.log(1-Y_hat))
+        return J
+    
+    
+    def cost_cv(self,Y_hat):
+        m=self.X_cv.shape[1]
+        J=(-1/m)*np.sum(self.Y_cv*np.log(Y_hat)+(1-self.Y_cv)*np.log(1-Y_hat))
         return J
     
     def grad(self,Y_hat,W,b):
