@@ -30,18 +30,23 @@ class lr():
         for i in range(self.iterations):
             Y_hat=self.sigmoid(self.Z(self.X,W,b))
             J=self.cost(Y_hat)
+            self.error.append(J)
             dW,db=self.grad(Y_hat,W,b)
             W=W-self.learning_rate*dW
             b=b-self.learning_rate*db
-            self.error.append(J)
+            
         self.W=W
         self.b=b
-    def predict(self,X):
+
+    def predict_proba(self,X):
         W,b=self.W,self.b
         Y_prob=self.sigmoid(self.Z(X,W,b))
+        return Y_prob
+    
+    def predict(self,X):
+        Y_prob=self.predict_proba(X)
         Y_pred=(Y_prob>0.5).astype(int)
         return Y_pred
-    
         
     def Z(self,X,W,b):
         Z=np.dot(W.T,X)+b
