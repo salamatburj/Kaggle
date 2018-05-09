@@ -17,25 +17,27 @@ class lr():
         self.Y=Y
         self.learning_rate=learning_rate
         self.iterations=iterations
+        self.W,self.b=self.initialize()
+        self.error=[]
+
     def initialize(self):
         n_x=self.X.shape[0]
         W=np.zeros((n_x,1)) 
         b=0
         return W,b
     def fit(self):
-        W,b=self.initialize()
-        J_list=[]
-
+        W,b=self.W,self.b
         for i in range(self.iterations):
             Y_hat=self.sigmoid(self.Z(self.X,W,b))
             J=self.cost(Y_hat)
             dW,db=self.grad(Y_hat,W,b)
             W=W-self.learning_rate*dW
             b=b-self.learning_rate*db
-            J_list.append(J)
-        return J_list,W,b
+            self.error.append(J)
+        self.W=W
+        self.b=b
     def predict(self,X):
-        _,W,b=self.fit()
+        W,b=self.W,self.b
         Y_prob=self.sigmoid(self.Z(X,W,b))
         Y_pred=(Y_prob>0.5).astype(int)
         return Y_pred
