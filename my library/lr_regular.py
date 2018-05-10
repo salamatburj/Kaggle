@@ -37,7 +37,7 @@ class lr():
         b=0
         return W,b
     def fit(self):
-        W,b=self.W,self.b
+        W,b=self.W,self.b # getting W, b values
         for i in range(self.iterations):
             Y_hat=self.sigmoid(self.Z(self.X,W,b))
             J=self.cost(Y_hat)
@@ -71,7 +71,8 @@ class lr():
     
     def cost(self,Y_hat):
         m=self.X.shape[1]
-        J=(-1/m)*np.sum(self.Y*np.log(Y_hat)+(1-self.Y)*np.log(1-Y_hat))+(self.lambd/(2*m))*np.dot(self.W.T,self.W)
+        J=(-1/m)*np.sum(self.Y*np.log(Y_hat)+(1-self.Y)*np.log(1-Y_hat))+np.squeeze((self.lambd/(2*m))*np.dot(self.W.T,self.W))
+        # np.squeeze to reduce dimentionlity, e.i, np.squeeze(array([[1]]))=array(1)
         return J
     
     
@@ -104,5 +105,5 @@ class lr():
         '''
         dZ=(1/m)*(Y_hat-self.Y)
         db=np.sum(dZ)
-        dW=np.dot(self.X,dZ.T)-(self.lambd/m)*W
+        dW=np.dot(self.X,dZ.T)+(self.lambd/m)*W
         return dW,db
